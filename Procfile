@@ -1,1 +1,1 @@
-web: yarn run serve-prod polygon-v3
+web: yarn run serve-prod avalanche-v3
