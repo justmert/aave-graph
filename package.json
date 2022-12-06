@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod": "yarn run graphclient build && yarn run graphclient serve-prod"
+    "build-prod": "sh -c 'yarn run graphclient build --dir $PWD/${0} && yarn run graphclient serve-prod --dir $PWD/${0}'",
+    "serve-prod": "sh -c 'yarn run graphclient serve-prod --dir $PWD/${0}'"
   },
   "repository": {
     "type": "git",

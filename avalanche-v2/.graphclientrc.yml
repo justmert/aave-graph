@@ -1,0 +1,5 @@
+sources:
+  - name: avalanche-v2
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/aave/protocol-v2-avalanche

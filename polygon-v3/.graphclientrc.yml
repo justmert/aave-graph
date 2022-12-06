@@ -1,0 +1,5 @@
+sources:
+  - name: Polygon V3
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/aave/protocol-v3-polygon
