@@ -1,1 +1,1 @@
-web: yarn run serve-prod eth-mainnet-v2
+web: yarn run serve-prod polygon-v2
