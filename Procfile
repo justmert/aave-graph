@@ -1,1 +1,1 @@
-web: yarn run serve-prod optimism-v3
+web: yarn run serve-prod fantom-v3
