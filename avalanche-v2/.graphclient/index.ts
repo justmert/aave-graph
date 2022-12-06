@@ -10,6 +10,7 @@ import { fetch as fetchFn } from '@whatwg-node/fetch';
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
+import BlockTrackingTransform from "@graphprotocol/client-block-tracking";
 import BareMerger from "@graphql-mesh/merger-bare";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
@@ -9219,7 +9220,7 @@ const avalancheV2Transforms = [];
 const additionalTypeDefs = [] as any[];
 const avalancheV2Handler = new GraphqlHandler({
               name: "avalanche-v2",
-              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v2-avalanche"},
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v2-avalanche","timeout":5000,"retry":2},
               baseDir,
               cache,
               pubsub,
@@ -9227,6 +9228,14 @@ const avalancheV2Handler = new GraphqlHandler({
               logger: logger.child("avalanche-v2"),
               importFn,
             });
+avalancheV2Transforms[0] = new BlockTrackingTransform({
+                  apiName: "avalanche-v2",
+                  config: {"validateSchema":false},
+                  baseDir,
+                  cache,
+                  pubsub,
+                  importFn
+                });
 sources[0] = {
           name: 'avalanche-v2',
           handler: avalancheV2Handler,

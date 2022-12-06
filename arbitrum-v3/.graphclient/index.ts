@@ -10,6 +10,7 @@ import { fetch as fetchFn } from '@whatwg-node/fetch';
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
+import BlockTrackingTransform from "@graphprotocol/client-block-tracking";
 import BareMerger from "@graphql-mesh/merger-bare";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
@@ -10058,7 +10059,7 @@ const arbitrumV3Transforms = [];
 const additionalTypeDefs = [] as any[];
 const arbitrumV3Handler = new GraphqlHandler({
               name: "arbitrum-v3",
-              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v3-arbitrum"},
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v3-arbitrum","timeout":5000,"retry":2},
               baseDir,
               cache,
               pubsub,
@@ -10066,6 +10067,14 @@ const arbitrumV3Handler = new GraphqlHandler({
               logger: logger.child("arbitrum-v3"),
               importFn,
             });
+arbitrumV3Transforms[0] = new BlockTrackingTransform({
+                  apiName: "arbitrum-v3",
+                  config: {"validateSchema":false},
+                  baseDir,
+                  cache,
+                  pubsub,
+                  importFn
+                });
 sources[0] = {
           name: 'arbitrum-v3',
           handler: arbitrumV3Handler,

@@ -10,6 +10,7 @@ import { fetch as fetchFn } from '@whatwg-node/fetch';
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
+import BlockTrackingTransform from "@graphprotocol/client-block-tracking";
 import BareMerger from "@graphql-mesh/merger-bare";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
@@ -9219,7 +9220,7 @@ const polygonV2Transforms = [];
 const additionalTypeDefs = [] as any[];
 const polygonV2Handler = new GraphqlHandler({
               name: "polygon-v2",
-              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic"},
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/aave-v2-matic","timeout":5000,"retry":2},
               baseDir,
               cache,
               pubsub,
@@ -9227,6 +9228,14 @@ const polygonV2Handler = new GraphqlHandler({
               logger: logger.child("polygon-v2"),
               importFn,
             });
+polygonV2Transforms[0] = new BlockTrackingTransform({
+                  apiName: "polygon-v2",
+                  config: {"validateSchema":false},
+                  baseDir,
+                  cache,
+                  pubsub,
+                  importFn
+                });
 sources[0] = {
           name: 'polygon-v2',
           handler: polygonV2Handler,

@@ -10,6 +10,7 @@ import { fetch as fetchFn } from '@whatwg-node/fetch';
 import { MeshResolvedSource } from '@graphql-mesh/runtime';
 import { MeshTransform, MeshPlugin } from '@graphql-mesh/types';
 import GraphqlHandler from "@graphql-mesh/graphql"
+import BlockTrackingTransform from "@graphprotocol/client-block-tracking";
 import BareMerger from "@graphql-mesh/merger-bare";
 import { printWithCache } from '@graphql-mesh/utils';
 import { createMeshHTTPHandler, MeshHTTPHandler } from '@graphql-mesh/http';
@@ -10058,7 +10059,7 @@ const polygonV3Transforms = [];
 const additionalTypeDefs = [] as any[];
 const polygonV3Handler = new GraphqlHandler({
               name: "Polygon V3",
-              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v3-polygon"},
+              config: {"endpoint":"https://api.thegraph.com/subgraphs/name/aave/protocol-v3-polygon","timeout":5000,"retry":2},
               baseDir,
               cache,
               pubsub,
@@ -10066,6 +10067,14 @@ const polygonV3Handler = new GraphqlHandler({
               logger: logger.child("Polygon V3"),
               importFn,
             });
+polygonV3Transforms[0] = new BlockTrackingTransform({
+                  apiName: "Polygon V3",
+                  config: {"validateSchema":false},
+                  baseDir,
+                  cache,
+                  pubsub,
+                  importFn
+                });
 sources[0] = {
           name: 'Polygon V3',
           handler: polygonV3Handler,
