@@ -1,1 +1,1 @@
-web: yarn run serve-prod fantom-v3
+web: yarn run serve-prod harmony-v3
