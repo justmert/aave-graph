@@ -1,20 +1,22 @@
 "use strict";
 
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+// import { createRequire } from "module";
+// const require = createRequire(import.meta.url);
 var clc = require("cli-color");
-import inquirer from "inquirer";
-import figlet from "figlet";
-import { exec, execSync, spawn } from "child_process";
-import * as fs from "fs";
+const inquirer = require("inquirer");
+var figlet = require("figlet");
+// import { exec, execSync, spawn } from "child_process";
+const { exec } = require("node:child_process");
+const fs = require("node:fs");
+// import * as fs from "fs";
 const yaml = require("js-yaml");
 
 process.removeAllListeners("warning");
-export const clearScreen = async () => {
+const clearScreen = async () => {
   process.stdout.write("\u001b[2J\u001b[0;0H");
 };
 
-export const colorSpec = {
+const colorSpec = {
   errorMsg: (x, newLine = true) => {
     let line = colorSpec.errorIcon + "  " + clc.red.bold(x);
     if (newLine) {
@@ -49,7 +51,7 @@ export const colorSpec = {
   infoIcon: clc.cyan("ℹ"),
 };
 
-export const welcomeScreen = async () => {
+const welcomeScreen = async () => {
   await clearScreen();
   console.log(
     clc.cyan(
@@ -107,74 +109,77 @@ const graphql = {
   },
 };
 
-await clearScreen();
-await welcomeScreen();
+const main = async () => {
+  await clearScreen();
+  await welcomeScreen();
+  const question = {
+    type: "list",
+    name: "action",
+    message: "What do you want to do?",
+    choices: Array.from(
+      Object.keys(graphql).map((x) => {
+        return { name: graphql[x].name, value: x };
+      })
+    ),
+  };
 
-const question = {
-  type: "list",
-  name: "action",
-  message: "What do you want to do?",
-  choices: Array.from(
-    Object.keys(graphql).map((x) => {
-      return { name: graphql[x].name, value: x };
+  let graphKey = undefined;
+  await inquirer
+    .prompt([question])
+    .then((answers) => {
+      graphKey = answers.action;
     })
-  ),
-};
+    .catch((error) => {
+      if (error.isTtyError) {
+        console.log(
+          colorSpec.errorMsg(
+            "Prompt couldn't be rendered in the current environment"
+          )
+        );
+      } else {
+        console.log(colorSpec.errorMsg(error));
+      }
+    });
 
-let graphKey = undefined;
-await inquirer
-  .prompt([question])
-  .then((answers) => {
-    graphKey = answers.action;
-  })
-  .catch((error) => {
-    if (error.isTtyError) {
-      console.log(
-        colorSpec.errorMsg(
-          "Prompt couldn't be rendered in the current environment"
-        )
-      );
-    } else {
-      console.log(colorSpec.errorMsg(error));
-    }
-  });
-
-let graphClientStructure = {
-  sources: [
-    {
-      name: undefined,
-      handler: {
-        graphql: {
-          endpoint: undefined,
+  let graphClientStructure = {
+    sources: [
+      {
+        name: undefined,
+        handler: {
+          graphql: {
+            endpoint: undefined,
+          },
         },
       },
-    },
-  ],
+    ],
+  };
+
+  graphClientStructure.sources[0].name = graphKey;
+  graphClientStructure.sources[0].handler.graphql.endpoint =
+    graphql[graphKey].endpoint;
+
+  fs.writeFileSync(
+    ".graphclientrc.yml",
+    yaml.dump(graphClientStructure, {
+      noRefs: true,
+      noCompatMode: true,
+      indent: "2",
+    })
+  );
+
+  const child = exec("yarn run graphclient serve-dev", {
+    stdio: "inherit",
+    detached: true,
+  });
+
+  child.on("exit", function () {
+    process.exit();
+  });
+
+  console.log(
+    colorSpec.successMsg(
+      `You can now open the Aave-v2-${graphKey} graphql interface at http://localhost:4000/`
+    )
+  );
 };
-
-graphClientStructure.sources[0].name = graphKey;
-graphClientStructure.sources[0].handler.graphql.endpoint = graphql[graphKey].endpoint;
-
-fs.writeFileSync(
-  ".graphclientrc.yml",
-  yaml.dump(graphClientStructure, {
-    noRefs: true,
-    noCompatMode: true,
-    indent: "2",
-  })
-);
-
-const child = exec("yarn run graphclient serve-dev", {
-  stdio: "inherit",
-  detached: true,
-});
-
-child.on("exit", function () {
-  process.exit();
-});
-
-console.log(
-  colorSpec.successMsg(
-    `You can now open the Aave-v2-${graphKey} graphql interface at http://localhost:4000/`
-  )
-);
+main();

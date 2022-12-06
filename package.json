@@ -4,7 +4,8 @@
   "description": "Graphql Editor for AAVE",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prod": "yarn run graphclient build && yarn run graphclient serve-prod"
   },
   "repository": {
     "type": "git",
@@ -16,7 +17,6 @@
     "GraphQL"
   ],
   "author": "Mert Köklü",
-  "type": "module",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/justmert/aave-graphql-editor/issues"
@@ -27,8 +27,7 @@
     "cli-color": "^2.0.3",
     "figlet": "^1.5.2",
     "graphql": "^16.6.0",
-    "inquirer": "^9.1.4",
+    "inquirer": "^8.2.5",
     "js-yaml": "^4.1.0"
-  },
-  "devDependencies": {}
+  }
 }
