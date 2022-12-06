@@ -1,1 +1,1 @@
-web: yarn run serve-prod arbitrum-v3
+web: yarn run serve-prod optimism-v3
